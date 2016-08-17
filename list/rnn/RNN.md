@@ -56,6 +56,40 @@ $$
 
 Vanishing Gradient问题可以被缓解，例如合理地初始化W，增加regularization项，以及使用[ReLU](https://en.wikipedia.org/wiki/Rectifier_(neural_networks)作为激活函数。但要从根本上摆脱，需要另一种更加复杂的模型--LSTM。
 
+### Add embedding
+
+Using word embedding such as word2vec and GloVe is a popular method to improve the accuracy of your model. Instead of using one-hot vectors to represent our words, the low-dimensional vectors learned using word2vec or GloVe carry semantic meaning – similar words have similar vectors. Using these vectors is a form of pre-training. Intuitively, you are telling the network which words are similar so that it needs to learn less about the language. Using pre-trained vectors is particularly useful if you don’t have a lot of data because it allows the network to generalize to unseen words.
+
+![rnn with word embedding](./rnn_embedding.jpg)
+
+The embedding matrix is just a lookup table – the ith column vector corresponds to the ith word in our vocabulary. No matter whether you have a pre-trained embedding or not, adding an embedding layer makes the architecture more consistent:
+
+  * Use fixed pre-trained embedding. During training, embedding matrix $E$ is constant and won't be updated.
+  * Use pre-trained embedding as initial value. Initial matrixn $E$ with a good initialization, but still update it during training.
+  * Learn embedding ourselves. If we don't have pre-trained embedding, by updating the matrix $E$, we are learning word vectors ourselves, but they are very specific to our data set and not as general as those that are trained on millions or billions of documents.
+
+### Add auxiliary features
+
+Until now, our input is purely the input sequence, no matter it is one-hot or word embedding. Sometimes, it is helpful to introduce more knowledge. Considering we are building a conversational bot. Before giving response, we want to predict the intent of the question. Let's take a look at the following two scenarios,
+
+    Scenario I:
+      What is the whether in Shanghai?  Intent: question_weather
+      How about Hongkong?               Intent: question_weather
+
+    Scenario II:
+      Wonderful places in Shanghai      Intent: question_poi
+      How about Hongkong?               Intent: question_poi
+
+In order to predict the intent of the second question, the intent of previous question is good and necessary knowledge. Those knowledge is often referred as **auxiliary feature**. Introducing auxiliary feature is straightforward: just add another input to the hidden layer.
+
+![auxiliary feature](./rnn_auxiliary.jpg)
+
+In detail, there will be an additional matrix in hidden state computation:
+
+$$s_t=a(Ws_{t-1}+Ux_t+Aau)$$
+
+In our conversational bot example, $au$ is a two dimension one-hot vector: each dimension is set if previous intent is that intent.
+
 ### Example: RNN language model building
 
 语言模型（LM）是对一个语料库的统计建模，其用途十分广泛，例如，为机器翻译（MT）、语音识别（SR）等产出的候选集打分选出得分最高的结果。LM解决的核心问题是计算给定句子的概率，这一个概率用链式法则展开为：

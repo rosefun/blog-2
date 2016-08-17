@@ -24,7 +24,7 @@ $$y_j^L=\frac{e^{z_j^L}}{\sum\limits_k e^{z_k^L}}$$
 
 选择sigmoid还是softmax作为输出层的激活函数，需要视具体问题而定。如果多个输出不是互斥的，例如，在预测用户属性时，一个输出是性别，另一个输出是是否患病，使用sigmoid更加自然。如果多个输出之间互斥，例如，手写体识别中，每个输出分表代表一个数字，则softmax是更合适的选择。
 
-### Train with Backpropagation
+### Training
 
 模型的训练涉及两个基本问题：代价函数定义，以及参数最优化。
 
@@ -36,9 +36,9 @@ cross entropy作为代价函数定义如下：
 
 $$C=D(a^L,y)=-\frac{1}{n}\sum\limits_x\sum\limits_j y_j\log a_j^L$$
 
-**参数最优化：SGD by Backpropagation**
+**参数最优化：Gradient descent**
 
-神经网络的训练常用SGD，NN的网络结构使得参数梯度求解有一个很棒的优化算法，称为后向传播算法（Backpropagation）。它利用求导链式法则，大幅降低了梯度求解的时间复杂度。
+Gradient descent is one of the most popular algorithms to perform optimization and by far the most common way to optimize neural networks. The architecture of neural network brings a perfect optimization method for gradient computation known as backpropagation, which leveraging chain-rule to reduce complexity significantly.
 
 BP算法的第一个要点是巧妙地递推各层中$C$关于$z$的梯度。
 
@@ -62,7 +62,15 @@ $$\frac{\partial C}{\partial b_j^l}=\frac{\partial C}{\partial z_j^l}$$
 
 $$\frac{\partial C}{\partial W_{jk}^l}={a_k^{l-1}}\frac{\partial C}{\partial {z_j^l}}$$
 
-BP之于神经网络就像FFT之于数字信号处理，是训练所有神经网络模型的基础。
+There are [three variants of gradient descent](http://sebastianruder.com/optimizing-gradient-descent/index.html#gradientdescentvariants), which differ in how much data we use to compute the gradient of the objective function.
+
+Vanilla mini-batch SGD is faced with [challenges](http://sebastianruder.com/optimizing-gradient-descent/index.html#challenges). There are [many algorithms](http://sebastianruder.com/optimizing-gradient-descent/index.html#gradientdescentoptimizationalgorithms) trying to improve its performance, including:
+  * Momentum
+  * Nesterov accelerated gradient
+  * Adagrad
+  * Adadelta
+  * RMSprop
+  * Adam
 
 ### Example : mnist手写数字识别
 
@@ -114,3 +122,65 @@ MNIST是一个手写字符图像数据集，其中有60000训练样本，10000�
     Accuracy on training data: 48922 / 50000
     Cost on evaluation data: 0.389545105544
     Accuracy on evaluation data: 9695 / 10000
+
+### Advanced
+
+#### Regularization
+
+Models with a large number of free parameters can describe an amazingly wide range of phenomena. When such a model agrees well with the available data, it may just mean there's enough freedom in the model that it can describe almost any data set of the given size, without capturing any genuine insights into the underlying phenomenon. When this happens the model will work well for the existing data, but will fail to generalize to new situations. It is known as [overfitting](http://neuralnetworksanddeeplearning.com/chap3.html#overfitting_and_regularization).
+
+What is the sign of overfitting? If accuracy on test set is no longer improving while total cost on training set is still decreasing, overfitting will happen. From a practical point of view, if we see that the accuracy on the test data is no longer improving, then we should stop training.
+
+How can we avoid overfitting? By increasing the amount of training data or reducing the size of network, we can reduce the extent to which overfitting occurs. However, there are other techniques which can reduce overfitting when we have a fixed network and fixed training data. These are known as regularization techniques, including:
+
+  * weight decay(L1/L2 regularization)
+  * dropout
+
+**L2**
+
+With L2, we can write the regularized cost function as
+
+$$C=C_0+\frac{\lambda}{2n}\sum\limits_w w^2$$
+
+where $C_0$ is the original, unregularized cost function. Then The learning rule for the weights becomes:
+
+$$w->w-\eta\frac{dC_0}{dw}-\frac{\eta\lambda}{n}w=(1-\frac{\eta}{n})w-\eta\frac{dC_0}{dw}$$
+
+The effect of weight decay is to make it so the network prefers to learn small weights. $\lambda$ is known as the regularization parameter. Regularization can be viewed as a way of compromising between finding small weights and minimizing the original cost function.
+
+Why does regularization help reduce overfitting? A standard story people tell to explain what's going on is along the following lines: smaller weights are, in some sense, lower complexity, and so provide a simpler and more powerful explanation for the data, and should thus be preferred.
+
+L2 regularization doesn't constrain the biases. Having a large bias doesn't make a neuron sensitive to its inputs in the same way as having large weights. So we don't need to worry about large biases enabling our network to learn the noise in our training data.
+
+**L1**
+
+Another regularization approach is L1. In this approach we modify the unregularized cost function by adding the sum of the absolute values of the weights:
+
+$$C=C_0+\frac{\lambda}{n}\sum\limits_w|w|$$
+
+Differentiating, we obtain the gradient updating rule:
+
+$$w->w-\frac{\eta\lambda}{n}\text{sgn}(w)-\eta\frac{dC_0}{dw}$$
+
+In L2 regularization, the weights shrink by an amount which is proportional to $w$. In L1 regularization, when a particular weight has a large magnitude, $|w|$, L1 regularization shrinks the weight much less than L2 regularization does. By contrast, when $|w|$ is small, L1 regularization shrinks the weight much more than L2 regularization. The net result is that L1 regularization tends to concentrate the weight of the network in a relatively small number of high-importance connections, while the other weights are driven toward zero.
+
+**Dropout**
+
+Dropout is a radically different technique for regularization. Unlike L1 and L2 regularization, dropout doesn't rely on modifying the cost function. Instead, in dropout we modify the network itself.
+
+We start by randomly (and temporarily) deleting partial of the hidden neurons(known as dropout ratio) in the network, while leaving the input and output neurons untouched. After doing this over a mini-batch, we choose a new random subset of hidden neurons to delete, estimating the gradient for a different mini-batch, and updating the weights and biases in the network.
+
+When we dropout different sets of neurons, it's rather like we're training different neural networks. And so the dropout procedure is like averaging the effects of a very large number of different networks. The different networks will overfit in different ways, and so, hopefully, the net effect of dropout will be to reduce overfitting.
+
+#### Hyper parameters
+
+Besides weights and biases, there are many other parameters in a neural network, known as hyper parameters:
+  * layers
+  * neurons of each layers
+  * initial weights
+  * regularization
+  * learning rate
+
+To choose a better hyper parameter, a validation data set other than training or testing set is often applied. The approach to finding good hyper-parameters is sometimes known as the **hold out**, since the validation set is kept apart or "held out" from the training set.
+
+But why we use another validation set rather than the test set? The answer is, if we set the hyper-parameters based on evaluations of the test set, it's possible we'll end up overfitting our hyper-parameters to the test set, and the performance of the network won't generalize to other data sets.

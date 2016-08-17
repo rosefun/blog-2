@@ -5,8 +5,9 @@ import numpy as np
 import nltk
 import sys
 from datetime import datetime
-from rnnnumpy import RNNNumpy
-from rnntheano import RNNTheano
+from rnn_numpy import RNNNumpy
+from rnn_theano import RNNTheano
+from lstm_theano import LSTMTheano
 
 class RNNLM:
     def __init__(self):
@@ -75,6 +76,11 @@ class RNNLM:
                                hidden_dim = 100, bptt_truncate = 4)
         self.model.sgd(x_train, y_train, 0.01, iterations)
 
+    def train_lstm_theano(self, x_train, y_train, iterations):
+        self.model = RNNTheano(word_dim = self.vocabulary_size,
+                               hidden_dim = 100, bptt_truncate = 4)
+        self.model.sgd(x_train, y_train, 0.01, iterations)
+
     def generate_sentence(self):
         # repeat until we get an end token
         sentence_start_idx = self.word_to_index[self.sentence_start_token]
@@ -107,5 +113,5 @@ if __name__ == "__main__":
 
     rnnlm = RNNLM()
     x_train, y_train = rnnlm.tokenize_data(200)
-    rnnlm.train_theano(x_train, y_train, iterations = 100)
+    rnnlm.train_lstm_theano(x_train, y_train, iterations = 100)
     rnnlm.generate_sentences(10, 7)
