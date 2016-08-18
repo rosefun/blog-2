@@ -13,7 +13,7 @@ Logistic regression（LR）自1958由David Cox提出，距今已有近60年的�
 
 ### LR模型结构
 
-LR对输入样本\(x\)的分类过程包括三个步骤：
+LR对输入样本$$x$$的分类过程包括三个步骤：
 
 1. 特征化
 2. 线性变换
@@ -38,7 +38,7 @@ LR对输入样本\(x\)的分类过程包括三个步骤：
     4 the
     5 time
 
-现在，对于任意给定的输入query，可以被转换为一个6维的向量，向量的第\(i\)维为1代表id为\(i\)的feature被触发，否则为0。
+现在，对于任意给定的输入query，可以被转换为一个6维的向量，向量的第$$i$$维为1代表id为$$i$$的feature被触发，否则为0。
 
     beijing weather     -> [1, 1, 0, 0, 0, 0]
     what is the weather -> [0, 1, 1, 1, 1, 0]
@@ -55,9 +55,11 @@ LR对输入样本\(x\)的分类过程包括三个步骤：
 
 **线性变换**
 
-得到样本的向量表示\(x\)之后，LR对其进行线性变换：
+得到样本的向量表示$$x$$之后，LR对其进行线性变换：
 
-$$z=wx+b$$
+$$
+z=wx+b
+$$
 
 其中的变量均为矩阵或向量，记x的维度（也就是特征个数）Dim(x)=m，分类的类别数为n，则各变量的维度如下：
 
@@ -65,17 +67,17 @@ $$z=wx+b$$
     b : n*1
     z : n*1
 
-\(z\)的每一维代表一个类别的得分，得分最高的类别就是分类结果。
+$$z$$的每一维代表一个类别的得分，得分最高的类别就是分类结果。
 
 **softmax**
 
-softmax函数\(y=\text{softmax}(z)\)将任意实数表示的向量\(z\)变换为向量\(y\)。\(y\)的每一维都是一个介于(0,1)之间的实数，且所有维度上的值和为1。因此，可以将\(y_i\)理解为\(x\)属于类别\(i\)的概率\(P(y=i|x)\)。
+softmax函数$$y=\text{softmax}(z)$$将任意实数表示的向量$$z$$变换为向量$$y$$。$$y$$的每一维都是一个介于(0,1)之间的实数，且所有维度上的值和为1。因此，可以将$$y_i$$理解为$$x$$属于类别$$i$$的概率$$P(y=i|x)$$。
 
-softmax变换是一个单调变换，并不会改变\(z\)在不同维度上取值的相对大小，因此对判别\(x\)所属的类别没有意义。变换的目的在于下文要提到的训练过程。
+softmax变换是一个单调变换，并不会改变$$z$$在不同维度上取值的相对大小，因此对判别$$x$$所属的类别没有意义。变换的目的在于下文要提到的训练过程。
 
 ### 训练
 
-以上LR模型中包含着很多未知的参数，包括线性变换的矩阵\(w\)和bias向量\(b\)。对于给定的训练样例，得出最优的参数取值的过程称为模型训练。
+以上LR模型中包含着很多未知的参数，包括线性变换的矩阵$$w$$和bias向量$$b$$。对于给定的训练样例，得出最优的参数取值的过程称为模型训练。
 
 训练的过程分为两步：
 
@@ -84,25 +86,31 @@ softmax变换是一个单调变换，并不会改变\(z\)在不同维度上取�
 
 #### 代价函数
 
-代价函数是模型输出结果和真实标注结果之间误差的度量。LR使用cross entropy作为代价函数。对于给定的n组训练样例\(((x^{(0)},y^{(0)}),...,(x^{(n-1)},y^{(n-1)}))\)，代价函数
+代价函数是模型输出结果和真实标注结果之间误差的度量。LR使用cross entropy作为代价函数。对于给定的n组训练样例$$((x^{(0)},y^{(0)}),...,(x^{(n-1)},y^{(n-1)}))$$，代价函数
 
-\[C=\sum_{i}D(y{'}^{(i)},y^{(i)})=-\sum_{i}\sum_{j}y_j^{(i)}\cdot\log y_j{'}^{(i)}\]
+$$
+C=\sum_{i}D(y{'}^{(i)},y^{(i)})=-\sum_{i}\sum_{j}y_j^{(i)}\cdot\log y_j{'}^{(i)}
+$$
 
-其中\(y'\)为模型输出，\(y\)为真实标注。
+其中$$y'$$为模型输出，$$y$$为真实标注。
 
-相比cross entropy，均方误差其实是一个更加直观的代价函数。但是由于softmax函数的性质，会使得参数\(w\)和\(b\)的[更新缓慢](http://neuralnetworksanddeeplearning.com/chap3.html#the_cross-entropy_cost_function)。而cross entropy没有这个问题，作为代价函数更为常用。
+相比cross entropy，均方误差其实是一个更加直观的代价函数。但是由于softmax函数的性质，会使得参数$$w$$和$$b$$的[更新缓慢](http://neuralnetworksanddeeplearning.com/chap3.html#the_cross-entropy_cost_function)。而cross entropy没有这个问题，作为代价函数更为常用。
 
-为了防止过度拟合训练数据，代价函数通常还会加上一项正则项（regularization），通常为\(|w|\)或\(||w||^2\)，分别称为l1、l2 norm/penatly/regularization。最终的代价函数如下，\(\alpha\)控制了regularization项在代价中的权重。
+为了防止过度拟合训练数据，代价函数通常还会加上一项正则项（regularization），通常为$$|w|$$或$$||w||^2$$，分别称为l1、l2 norm/penatly/regularization。最终的代价函数如下，$$\alpha$$控制了regularization项在代价中的权重。
 
-\[ \text{L2: } C=-\sum_{i}\sum_{j}y_j^{(i)}\log y_j{'}^{(i)}+\frac{1}{2}\alpha||w||^2\]
+$$
+ \text{L2: } C=-\sum_{i}\sum_{j}y_j^{(i)}\log y_j{'}^{(i)}+\frac{1}{2}\alpha||w||^2
+$$
 
-\[ \text{L1: } C=-\sum_{i}\sum_{j}y_j^{(i)}\log y_j{'}^{(i)}+\alpha|w|\]
+$$
+ \text{L1: } C=-\sum_{i}\sum_{j}y_j^{(i)}\log y_j{'}^{(i)}+\alpha|w|
+$$
 
 #### 最优化参数
 
 **Batch Gradient Descent**
 
-对于已知的固定训练数据，代价函数C是关于\(w\)和\(b\)的函数，而且是一个凸函数，即存在全局最优解。求解这个最优解的一个最常用迭代算法称为梯度下降（Batch Gradient Descent）。
+对于已知的固定训练数据，代价函数C是关于$$w$$和$$b$$的函数，而且是一个凸函数，即存在全局最优解。求解这个最优解的一个最常用迭代算法称为梯度下降（Batch Gradient Descent）。
 
 	Choose an initial vector of parameters w and learning rate \eta.
 	Repeat until an approximate minimum is obtained:
@@ -113,11 +121,13 @@ softmax变换是一个单调变换，并不会改变\(z\)在不同维度上取�
 
 **Stochastic Gradient descent**
 
-Gradient descent的复杂度相当高。\(w\)和\(b\)的每一次更新，都必须遍历所有的training data。一个更加常用的训练算法是统计梯度下降（Stochastic gradient descent,SGD）。相比Batch Gradient Descent要全部遍历一遍训练数据才能更新一次参数，SGD则每见到一个训练数据之就更新一次参数。
+Gradient descent的复杂度相当高。$$w$$和$$b$$的每一次更新，都必须遍历所有的training data。一个更加常用的训练算法是统计梯度下降（Stochastic gradient descent,SGD）。相比Batch Gradient Descent要全部遍历一遍训练数据才能更新一次参数，SGD则每见到一个训练数据之就更新一次参数。
 
 采用SGD时，代价函数不再是对所有training samples的加和，而是只计算当前样例：
 
-\[C=-\sum_{j}y_j^{(i)}\log y_j{'}^{(i)}+\frac{1}{2}\alpha||w||^2\]
+$$
+C=-\sum_{j}y_j^{(i)}\log y_j{'}^{(i)}+\frac{1}{2}\alpha||w||^2
+$$
 
 	Choose an initial vector of parameters w and learning rate \eta.
 	Repeat until an approximate minimum is obtained:
@@ -136,7 +146,9 @@ SGD由于自身的特点和优势，是目前广泛使用的参数优化方法�
 
 mini-batch SGD尽管很常用，但是也存在很多[问题](http://sebastianruder.com/optimizing-gradient-descent/index.html#challenges)。例如，如果我们仔细考虑SGD的梯度下降过程：
 
-\[\theta=\theta - \eta \nabla C(\theta)\]
+$$
+\theta=\theta - \eta \nabla C(\theta)
+$$
 
 会发现我们是用参数减去参数的梯度，二者的单位其实都不同。SGD实际利用的仅仅是极值相对于当前值得方位信息，这一方位由梯度的方向指出，在求解过程中有可能出现在极值附近来回震荡的情况。
 
@@ -155,37 +167,47 @@ mini-batch SGD尽管很常用，但是也存在很多[问题](http://sebastianru
 
 到这里，LR的所有重要细节都已经展现在我们面前了。最后要问的问题是，为什么LR是行之有效的分类方法呢？从概率论的角度，LR有其数学解释。
 
-让我们切换到概率角度，来重新思考代价函数该如何定义才合理。一个直接的想法是：建模正确分类的概率。假设训练数据\((x^{(0)},y^{(0)}),...,(x^{(n-1)},y^{(n-1)})\)服从独立同分布（identical independent distribution,i.i.d.），则分类正确的概率为：
+让我们切换到概率角度，来重新思考代价函数该如何定义才合理。一个直接的想法是：建模正确分类的概率。假设训练数据$$(x^{(0)},y^{(0)}),...,(x^{(n-1)},y^{(n-1)})$$服从独立同分布（identical independent distribution,i.i.d.），则分类正确的概率为：
 
-\[p(y^{(0)},...,y^{(n-1)}|x^{(0)},...,x^{(n-1)};w,b)=\prod\limits_{i} p(y^{(i)}|x^{(i)};w,b)\]
+$$
+p(y^{(0)},...,y^{(n-1)}|x^{(0)},...,x^{(n-1)};w,b)=\prod\limits_{i} p(y^{(i)}|x^{(i)};w,b)
+$$
 
-这个概率被称为后验概率，它是关于参数\(w\)和\(b\)的函数，统计学上称为似然函数（likelihood）。对它取对数值，将乘法转换为加法，就得到对数似然函数（log likelihood）：
+这个概率被称为后验概率，它是关于参数$$w$$和$$b$$的函数，统计学上称为似然函数（likelihood）。对它取对数值，将乘法转换为加法，就得到对数似然函数（log likelihood）：
 
-\[L(w,b)=\log p(y^{(1)},...,y^{(n)}|x^{(1)},...,x^{(n)};w,b)=\sum\limits_{i}\log p(y^{(i)}=k^{(i)}|x^{(i)};w,b)\]
+$$
+L(w,b)=\log p(y^{(1)},...,y^{(n)}|x^{(1)},...,x^{(n)};w,b)=\sum\limits_{i}\log p(y^{(i)}=k^{(i)}|x^{(i)};w,b)
+$$
 
-LR的cross entropy代价函数\(C\)实际上就是该对数似然函数\(L(w,b)\)。注意到，LR训练数据的真实标注\(y\)是一个只有在真实类别k对应的维度上为1，其它维度全部为0的向量。这样以来，cross entropy其实就是\(y'\)在维度k上的取值\(y_k'\)的log值。最大化cross entropy，就是最大化了对数似然函数，也即最大化后验概率。回到本节开头的想法，我们对LR的有效性、合理性就有了一定程度地理解和自信。像LR这种直接建模后验概率\(p(y^{(i)}|x^{(i)})\)，而不是样本联合分布\(p(x^{(i)},y^{(i)})\)的模型，通常被归为判别式模型（discriminative model）。
+LR的cross entropy代价函数$$C$$实际上就是该对数似然函数$$L(w,b)$$。注意到，LR训练数据的真实标注$$y$$是一个只有在真实类别k对应的维度上为1，其它维度全部为0的向量。这样以来，cross entropy其实就是$$y'$$在维度k上的取值$$y_k'$$的log值。最大化cross entropy，就是最大化了对数似然函数，也即最大化后验概率。回到本节开头的想法，我们对LR的有效性、合理性就有了一定程度地理解和自信。像LR这种直接建模后验概率$$p(y^{(i)}|x^{(i)})$$，而不是样本联合分布$$p(x^{(i)},y^{(i)})$$的模型，通常被归为判别式模型（discriminative model）。
 
 ### LR vs SVM
 
 在分类方面，另一个被认为是效果最好的分类算法是[SVM](http://blog.pluskid.org/?p=632)，它无论在理论上还是在工程实现上都堪称完美。SVM的代价函数定义如下:
 
-\[\max \frac{1}{||w||}, s.t., y^{(i)}(w^Tx^{(i)}+b)\ge1,i=0,...,n-1\]
+$$
+\max \frac{1}{||w||}, s.t., y^{(i)}(w^Tx^{(i)}+b)\ge1,i=0,...,n-1
+$$
 
-这一代价函数也是一个有全局最优解的凸函数，优化这个带有约束条件的复杂代价函数的过程，可以通俗的解释为：找到两个平行的超平面a和b，使得正例和反例分别全部处于a和b的一侧，且a和b的**距离最大**。此时，a和b的正中间1/2处的超平面就是最优的\(w\)和\(b\)定义的平面
+这一代价函数也是一个有全局最优解的凸函数，优化这个带有约束条件的复杂代价函数的过程，可以通俗的解释为：找到两个平行的超平面a和b，使得正例和反例分别全部处于a和b的一侧，且a和b的**距离最大**。此时，a和b的正中间1/2处的超平面就是最优的$$w$$和$$b$$定义的平面
 
 ![svm optimal hyper plane](./svm_optimal_hyper_plane.png)
 
 实际中，严格可分（称为hard-margin）的情况通常不太常见，我们需要能够容忍一定量的噪声样例。考虑到这一点，我们引入[hingle](https://en.wikipedia.org/wiki/Hinge_loss)函数，它对于分类正确的样例值为0，对于错分的样例有一定的惩罚（称为soft-margin）。最终，SVM的代价函数可以等价变化为如下形式，并且摆脱了约束条件。
 
-\[\text{SVM: }\min\limits_w\frac{1}{2}\alpha w^Tw+\sum\limits_i\max(0,1-y^{(i)}(w^Tx^{(i)}+b)),y \in \{+1,-1\}\]
+$$
+\text{SVM: }\min\limits_w\frac{1}{2}\alpha w^Tw+\sum\limits_i\max(0,1-y^{(i)}(w^Tx^{(i)}+b)),y \in \{+1,-1\}
+$$
 
 此时，我们的第一个发现是，SGD等优化方法同样可以用来训练SVM，尽管SVM漂亮的理论使得它有其它漂亮实用的训练方法coordinate descent。
 
 第二点，我们对比LR的代价函数：
 
-\[\text{LR: } \min\limits_w\frac{1}{2}\alpha w^Tw+\sum\limits_{i}\log(1+e^{-y^{(i)}(w^Tx^{(i)}+b)}),y \in \{+1,-1\}\]
+$$
+\text{LR: } \min\limits_w\frac{1}{2}\alpha w^Tw+\sum\limits_{i}\log(1+e^{-y^{(i)}(w^Tx^{(i)}+b)}),y \in \{+1,-1\}
+$$
 
-可以看出，二者的差别其实就是\(\log(1+e^{-x})\)和\(\max(0,1-x)\)的差别。实际上，二者的差距并不算很大，所以可以预期LR和SVM在线性分类上效果是可比的。
+可以看出，二者的差别其实就是$$\log(1+e^{-x})$$和$$\max(0,1-x)$$的差别。实际上，二者的差距并不算很大，所以可以预期LR和SVM在线性分类上效果是可比的。
 
 ![Loss function of LR and SVM](.\loss_log_vs_hinge.png)
 

@@ -11,34 +11,46 @@ RNN是一个三层结构：Input layer，中间recurrent layer和output layer，
 
 展开后的RNN网络类似于传统的feedforward NN，区别有以下两点：
 
-* 每层网络（对应RNN的每个时刻）的输入有两个:上一时刻的输出$s_{t-1}$和一个时刻$t$的输入$x_t$。
-* 每层网络共享同一套参数$U,V,W$。模型参数相对减少了不少。
+* 每层网络（对应RNN的每个时刻）的输入有两个:上一时刻的输出$$s_{t-1}$$和一个时刻$$t$$的输入$$x_t$$。
+* 每层网络共享同一套参数$$U,V,W$$。模型参数相对减少了不少。
 
 ### Train with BPTT
 
 在RNN的训练过程中，通常会使用一个叫做Backpropagation Through Time(BPTT)的算法来计算梯度。下面我们将看到，BPTT实际上是由于RNN特殊的网络结构而对BP所做的一个扩展。
 
-网络参数$V$仅有$s_t$作为其输入，因此，$C_t$关于$V$的梯度计算比较简单：
+网络参数$$V$$仅有$$s_t$$作为其输入，因此，$$C_t$$关于$$V$$的梯度计算比较简单：
 
-$$\frac{\partial C_t}{\partial V}=\frac{\partial C_t}{\partial y_t} \frac{\partial y_t}{\partial V}=(o_t - \hat{y_t}) \otimes s_t$$
+$$
+\frac{\partial C_t}{\partial V}=\frac{\partial C_t}{\partial y_t} \frac{\partial y_t}{\partial V}=(o_t - \hat{y_t}) \otimes s_t
+$$
 
-$C_t$关于$U$和$W$的梯度计算需要利用递推。参考BP，我们第一步选择$\frac{\partial C_t}{\partial z_t}$作为递推变量，有以下递推关系：
+$$C_t$$关于$$U$$和$$W$$的梯度计算需要利用递推。参考BP，我们第一步选择$$\frac{\partial C_t}{\partial z_t}$$作为递推变量，有以下递推关系：
 
-$$\frac{\partial C_t}{\partial z_t}=\frac{\partial C_t}{\partial s_t}\frac{\partial s_t}{\partial z_t}=\frac{\partial C_t}{\partial y_t}\frac{\partial y_t}{\partial s_t}\frac{\partial s_t}{\partial z_t}=V^T(o_t - \hat{y_t}) a_t'(z)$$
+$$
+\frac{\partial C_t}{\partial z_t}=\frac{\partial C_t}{\partial s_t}\frac{\partial s_t}{\partial z_t}=\frac{\partial C_t}{\partial y_t}\frac{\partial y_t}{\partial s_t}\frac{\partial s_t}{\partial z_t}=V^T(o_t - \hat{y_t}) a_t'(z)
+$$
 
-$$\frac{\partial C_t}{\partial z_{t-1}}=\frac{\partial C_t}{\partial z_t} \frac{\partial z_t}{\partial z_{s-1}} \frac{\partial s_{t-1}}{\partial z_{t-1}}=W^T \frac{\partial C_t}{\partial z_t} a_{t-1}'(z)$$
+$$
+\frac{\partial C_t}{\partial z_{t-1}}=\frac{\partial C_t}{\partial z_t} \frac{\partial z_t}{\partial z_{s-1}} \frac{\partial s_{t-1}}{\partial z_{t-1}}=W^T \frac{\partial C_t}{\partial z_t} a_{t-1}'(z)
+$$
 
-第二步，我们借助$\frac{\partial C_t}{\partial z_t}$，推导$\frac{\partial C_t}{\partial U}$和$\frac{\partial C_t}{\partial W}$：
+第二步，我们借助$$\frac{\partial C_t}{\partial z_t}$$，推导$$\frac{\partial C_t}{\partial U}$$和$$\frac{\partial C_t}{\partial W}$$：
 
-$$\frac{\partial C_t}{\partial W}=\frac{\partial C_t}{\partial z_t} \frac{\partial z_t}{\partial W}$$
+$$
+\frac{\partial C_t}{\partial W}=\frac{\partial C_t}{\partial z_t} \frac{\partial z_t}{\partial W}
+$$
 
-共享参数就是在这里制造了一点麻烦。$z_t=Ux_t+Ws_{t-1}$，其中$s_{t-1}=a(z_{t-1})=a(Ux_{t-1}+Ws_{t-2})$仍然以$W$为变量。BPTT就是为了解决这个问题对BP做了一点变化，$\frac{\partial C_t}{\partial W}$不再只依赖t时刻的$\frac{\partial C_t}{\partial z_t}$，而是依赖整个[1, t]时刻：
+共享参数就是在这里制造了一点麻烦。$$z_t=Ux_t+Ws_{t-1}$$，其中$$s_{t-1}=a(z_{t-1})=a(Ux_{t-1}+Ws_{t-2})$$仍然以$$W$$为变量。BPTT就是为了解决这个问题对BP做了一点变化，$$\frac{\partial C_t}{\partial W}$$不再只依赖t时刻的$$\frac{\partial C_t}{\partial z_t}$$，而是依赖整个[1, t]时刻：
 
-$$\frac{\partial C_t}{\partial W}=\frac{\partial C_t}{\partial z_t} \frac{\partial z_t}{\partial W}=\sum\limits_1^t \frac{\partial C_t}{\partial z_t} s_{t-1}$$
+$$
+\frac{\partial C_t}{\partial W}=\frac{\partial C_t}{\partial z_t} \frac{\partial z_t}{\partial W}=\sum\limits_1^t \frac{\partial C_t}{\partial z_t} s_{t-1
+}$$
 
-$\frac{\partial C_t}{\partial U}$和$\frac{\partial C_t}{\partial W}$一样存在类似问题，同样可推导得出：
+$$\frac{\partial C_t}{\partial U}$$和$$\frac{\partial C_t}{\partial W}$$一样存在类似问题，同样可推导得出：
 
-$$\frac{\partial C_t}{\partial U}=\frac{\partial C_t}{\partial z_t} \frac{\partial z_t}{\partial U}=\sum\limits_1^t \frac{\partial C_t}{\partial z_t} x_t$$
+$$
+\frac{\partial C_t}{\partial U}=\frac{\partial C_t}{\partial z_t} \frac{\partial z_t}{\partial U}=\sum\limits_1^t \frac{\partial C_t}{\partial z_t} x_t
+$$
 
 可以看出，如果输入序列长度较长，梯度计算将需要后向传播很多层，训练时间会因此增加。实际实现上，通常会截断传播层数为k，即只对时间窗口[t-k, t]内的梯度进行累加。
 
@@ -46,13 +58,13 @@ $$\frac{\partial C_t}{\partial U}=\frac{\partial C_t}{\partial z_t} \frac{\parti
 
 表面上看，RNN是一个理论上完美的模型，它可以自动捕捉、记忆上文信息。它在NLP领域也得到了很多成功的应用。然而，1991年Sepp Hochreiter[发现](http://people.idsia.ch/~juergen/fundamentaldeeplearningproblem.html)，RNN其实并不能捕捉相距很远的输出和输入之间的关联，对于需要很长上下文的任务，RNN不能很好地工作。造成这一现象的原因是[Gradient Vanishing](http://neuralnetworksanddeeplearning.com/chap5.html#what's_causing_the_vanishing_gradient_problem_unstable_gradients_in_deep_neural_nets)。
 
-Gadient Vanishing问题导致的直观结果是时刻$t$的hidden state $s_t$难以影响相距较远的时刻t+k的$s_{t+k}$，这一点可以通过观察$\partial s_{t+m}/\partial s_t$来验证。
+Gadient Vanishing问题导致的直观结果是时刻$$t$$的hidden state $$s_t$$难以影响相距较远的时刻t+k的$$s_{t+k}$$，这一点可以通过观察$$\partial s_{t+m}/\partial s_t$$来验证。
 
 $$
 \frac{\partial s_{t+k}}{\partial s_t}=\frac{\partial s_{t+k}}{\partial s_{t+k-1}} * \cdot\cdot\cdot * \frac{\partial s_{t+1}}{\partial s_{t}}=\left(a_{t+k}'(z_{t+k})W\right) * \cdot\cdot\cdot * \left(a_{t}'(z_t) * W\right)
 $$
 
-常用的sigmod和tanh的倒数取值在[0,1/4]之间，并且在$\pm\infty$处快速趋于0。而$a'_t=a'(Ux_t+Ws_{t-1})$以$W$为参数，想使得$a'_t$较大，$|W|$需要取一个接近于0的值；如果$|W|$较大，$a'_t$反而趋近于0。因此，$|(a_{t}'(z_t) * W)|$实际上通常小于1，多个这样的项相乘，会导致结果指数级下降，从而发生Gadient Vanishing。Gradient Vanishing并非针对RNN，在所有深度网络中都存在，导致深度网络难以训练。
+常用的sigmod和tanh的倒数取值在[0,1/4]之间，并且在$$\pm\infty$$处快速趋于0。而$$a'_t=a'(Ux_t+Ws_{t-1})$$以$$W$$为参数，想使得$$a'_t$$较大，$$|W|$$需要取一个接近于0的值；如果$$|W|$$较大，$$a'_t$$反而趋近于0。因此，$$|(a_{t}'(z_t) * W)|$$实际上通常小于1，多个这样的项相乘，会导致结果指数级下降，从而发生Gadient Vanishing。Gradient Vanishing并非针对RNN，在所有深度网络中都存在，导致深度网络难以训练。
 
 Vanishing Gradient问题可以被缓解，例如合理地初始化W，增加regularization项，以及使用[ReLU](https://en.wikipedia.org/wiki/Rectifier_(neural_networks)作为激活函数。但要从根本上摆脱，需要另一种更加复杂的模型--LSTM。
 
@@ -64,9 +76,9 @@ Using word embedding such as word2vec and GloVe is a popular method to improve t
 
 The embedding matrix is just a lookup table – the ith column vector corresponds to the ith word in our vocabulary. No matter whether you have a pre-trained embedding or not, adding an embedding layer makes the architecture more consistent:
 
-  * Use fixed pre-trained embedding. During training, embedding matrix $E$ is constant and won't be updated.
-  * Use pre-trained embedding as initial value. Initial matrixn $E$ with a good initialization, but still update it during training.
-  * Learn embedding ourselves. If we don't have pre-trained embedding, by updating the matrix $E$, we are learning word vectors ourselves, but they are very specific to our data set and not as general as those that are trained on millions or billions of documents.
+  * Use fixed pre-trained embedding. During training, embedding matrix $$E$$ is constant and won't be updated.
+  * Use pre-trained embedding as initial value. Initial matrixn $$E$$ with a good initialization, but still update it during training.
+  * Learn embedding ourselves. If we don't have pre-trained embedding, by updating the matrix $$E$$, we are learning word vectors ourselves, but they are very specific to our data set and not as general as those that are trained on millions or billions of documents.
 
 ### Add auxiliary features
 
@@ -86,19 +98,25 @@ In order to predict the intent of the second question, the intent of previous qu
 
 In detail, there will be an additional matrix in hidden state computation:
 
-$$s_t=a(Ws_{t-1}+Ux_t+Aau)$$
+$$
+s_t=a(Ws_{t-1}+Ux_t+Aau)
+$$
 
-In our conversational bot example, $au$ is a two dimension one-hot vector: each dimension is set if previous intent is that intent.
+In our conversational bot example, $$au$$ is a two dimension one-hot vector: each dimension is set if previous intent is that intent.
 
 ### Example: RNN language model building
 
 语言模型（LM）是对一个语料库的统计建模，其用途十分广泛，例如，为机器翻译（MT）、语音识别（SR）等产出的候选集打分选出得分最高的结果。LM解决的核心问题是计算给定句子的概率，这一个概率用链式法则展开为：
 
-$$P(w_1,...w_k)=\prod\limits_{i=1}^{k}P(w_i|w_1,...,|w_i)$$
+$$
+P(w_1,...w_k)=\prod\limits_{i=1}^{k}P(w_i|w_1,...,|w_i)
+$$
 
 传统n-gram语言模型的上下文长度n是有限的，认为窗口n以外的词不会对预测下一个词产生影响，上式得以简化：
 
-$$P(w_1,...w_k)=\prod\limits_{i=1}^{k}P(w_i|w_{i-n+1},...,|w_i)$$
+$$
+P(w_1,...w_k)=\prod\limits_{i=1}^{k}P(w_i|w_{i-n+1},...,|w_i)
+$$
 
 而RNN有能力建模很长的上下文，打破了n-gram在建模上的假设。
 
@@ -115,9 +133,9 @@ $$P(w_1,...w_k)=\prod\limits_{i=1}^{k}P(w_i|w_{i-n+1},...,|w_i)$$
 
 于是，RNN网络中各个变量的含义如下：
 
-* $x_t$是当前时刻输入的word，表示为一个词表大小的one-hot vector，只有当前词对应的id位置值为1，其余全为0。
-* $s_t=a(z), z=Ux_t+Ws_{t-1}$，为当前时刻的隐藏状态（hidden state），是一个向量，$a(\cdot)$通常取tanh或sigmoid等非线性激活函数。$s_t$可以看作是截至当前时刻$t$对所有输入的“总结”和“记忆”。
-* $o_t=\text{softmax}(y_t)=\text{softmax}(Vs_t)$，为当前时刻的输出向量，每一维代表输出该词的概率。
+* $$x_t$$是当前时刻输入的word，表示为一个词表大小的one-hot vector，只有当前词对应的id位置值为1，其余全为0。
+* $$s_t=a(z), z=Ux_t+Ws_{t-1}$$，为当前时刻的隐藏状态（hidden state），是一个向量，$$a(\cdot)$$通常取tanh或sigmoid等非线性激活函数。$$s_t$$可以看作是截至当前时刻$$t$$对所有输入的“总结”和“记忆”。
+* $$o_t=\text{softmax}(y_t)=\text{softmax}(Vs_t)$$，为当前时刻的输出向量，每一维代表输出该词的概率。
 
 完整的代码见[numpy实现](./rnn_numpy.py)和[theano实现](./rnn_theano.py)。核心的BPTT实现上和BP很类似，区别仅在于错误后向传播的距离不止一层，而是直到第一个时刻。
 

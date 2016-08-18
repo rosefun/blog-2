@@ -4,7 +4,7 @@
 
 ### Model
 
-神经网络的基本单位是神经元（neuron），它对输入做线性加权，再应用激活函数（activation function）$a(x)$后输出:$y=a(z)=a(wx+b)$。
+神经网络的基本单位是神经元（neuron），它对输入做线性加权，再应用激活函数（activation function）$$a(x)$$后输出:$$y=a(z)=a(wx+b)$$。
 
 ![neuron](./neurons.jpg)
 
@@ -18,9 +18,11 @@
 
 常用的激活函数包括sigmod和tanh函数。他们共同的性质是对称、有界且倒数对称、有界。
 
-在输出层，有时会应用另外一个激活函数：softmax函数。输出层应用一个softmax函数将$z^L$转换为一个概率分布向量：
+在输出层，有时会应用另外一个激活函数：softmax函数。输出层应用一个softmax函数将$$z^L$$转换为一个概率分布向量：
 
-$$y_j^L=\frac{e^{z_j^L}}{\sum\limits_k e^{z_k^L}}$$
+$$
+y_j^L=\frac{e^{z_j^L}}{\sum\limits_k e^{z_k^L}}
+$$
 
 选择sigmoid还是softmax作为输出层的激活函数，需要视具体问题而定。如果多个输出不是互斥的，例如，在预测用户属性时，一个输出是性别，另一个输出是是否患病，使用sigmoid更加自然。如果多个输出之间互斥，例如，手写体识别中，每个输出分表代表一个数字，则softmax是更合适的选择。
 
@@ -34,33 +36,45 @@ $$y_j^L=\frac{e^{z_j^L}}{\sum\limits_k e^{z_k^L}}$$
 
 cross entropy作为代价函数定义如下：
 
-$$C=D(a^L,y)=-\frac{1}{n}\sum\limits_x\sum\limits_j y_j\log a_j^L$$
+$$
+C=D(a^L,y)=-\frac{1}{n}\sum\limits_x\sum\limits_j y_j\log a_j^L
+$$
 
 **参数最优化：Gradient descent**
 
 Gradient descent is one of the most popular algorithms to perform optimization and by far the most common way to optimize neural networks. The architecture of neural network brings a perfect optimization method for gradient computation known as backpropagation, which leveraging chain-rule to reduce complexity significantly.
 
-BP算法的第一个要点是巧妙地递推各层中$C$关于$z$的梯度。
+BP算法的第一个要点是巧妙地递推各层中$$C$$关于$$z$$的梯度。
 
 ![backpropagation](./bp.jpg)
 
-$$\frac{\partial C}{\partial z_j^l}=\sum\limits_k\frac{\partial C}{z_k^{l+1}}\frac{\partial z_k^{l+1}}{z_j^l}
+$$
+\frac{\partial C}{\partial z_j^l}=\sum\limits_k\frac{\partial C}{z_k^{l+1}}\frac{\partial z_k^{l+1}}{z_j^l}
 =\sum\limits_k\frac{\partial z_k^{l+1}}{z_j^l}\cdot\frac{\partial C}{z_k^{l+1}}
-=\sum\limits_k w_{kj}^{l+1}\sigma'(z_j^l)\frac{\partial C}{z_k^{l+1}}$$
+=\sum\limits_k w_{kj}^{l+1}\sigma'(z_j^l)\frac{\partial C}{z_k^{l+1}}
+$$
 
 使用矩阵表示则为：
 
-$$\frac{\partial C}{\partial z^L}=(\frac{\partial C}{\partial a^L})\frac{\partial \sigma(z^L)}{\partial z^L}$$
+$$
+\frac{\partial C}{\partial z^L}=(\frac{\partial C}{\partial a^L})\frac{\partial \sigma(z^L)}{\partial z^L}
+$$
 
-$$\frac{\partial C}{\partial z^l}=((W^{l+1})^T\frac{\partial C}{\partial z^{l+1}})\sigma'(z^l)$$
+$$
+\frac{\partial C}{\partial z^l}=((W^{l+1})^T\frac{\partial C}{\partial z^{l+1}})\sigma'(z^l)
+$$
 
-可见，每一层中$C$关于$z$的梯度可以由后一层的梯度递推而来，即误差（梯度）“从后向前层层传播”，故名Backpropagation。
+可见，每一层中$$C$$关于$$z$$的梯度可以由后一层的梯度递推而来，即误差（梯度）“从后向前层层传播”，故名Backpropagation。
 
-BP算法的第二个要点是以$C$关于$z$的梯度为桥梁，求解$C$关于网络参数$W$和$b$的梯度：
+BP算法的第二个要点是以$$C$$关于$$z$$的梯度为桥梁，求解$$C$$关于网络参数$$W$$和$$b$$的梯度：
 
-$$\frac{\partial C}{\partial b_j^l}=\frac{\partial C}{\partial z_j^l}$$
+$$
+\frac{\partial C}{\partial b_j^l}=\frac{\partial C}{\partial z_j^l}
+$$
 
-$$\frac{\partial C}{\partial W_{jk}^l}={a_k^{l-1}}\frac{\partial C}{\partial {z_j^l}}$$
+$$
+\frac{\partial C}{\partial W_{jk}^l}={a_k^{l-1}}\frac{\partial C}{\partial {z_j^l}}
+$$
 
 There are [three variants of gradient descent](http://sebastianruder.com/optimizing-gradient-descent/index.html#gradientdescentvariants), which differ in how much data we use to compute the gradient of the objective function.
 
@@ -140,13 +154,17 @@ How can we avoid overfitting? By increasing the amount of training data or reduc
 
 With L2, we can write the regularized cost function as
 
-$$C=C_0+\frac{\lambda}{2n}\sum\limits_w w^2$$
+$$
+C=C_0+\frac{\lambda}{2n}\sum\limits_w w^2
+$$
 
-where $C_0$ is the original, unregularized cost function. Then The learning rule for the weights becomes:
+where $$C_0$$ is the original, unregularized cost function. Then The learning rule for the weights becomes:
 
-$$w->w-\eta\frac{dC_0}{dw}-\frac{\eta\lambda}{n}w=(1-\frac{\eta}{n})w-\eta\frac{dC_0}{dw}$$
+$$
+w->w-\eta\frac{dC_0}{dw}-\frac{\eta\lambda}{n}w=(1-\frac{\eta}{n})w-\eta\frac{dC_0}{dw}
+$$
 
-The effect of weight decay is to make it so the network prefers to learn small weights. $\lambda$ is known as the regularization parameter. Regularization can be viewed as a way of compromising between finding small weights and minimizing the original cost function.
+The effect of weight decay is to make it so the network prefers to learn small weights. $$\lambda$$ is known as the regularization parameter. Regularization can be viewed as a way of compromising between finding small weights and minimizing the original cost function.
 
 Why does regularization help reduce overfitting? A standard story people tell to explain what's going on is along the following lines: smaller weights are, in some sense, lower complexity, and so provide a simpler and more powerful explanation for the data, and should thus be preferred.
 
@@ -156,13 +174,17 @@ L2 regularization doesn't constrain the biases. Having a large bias doesn't make
 
 Another regularization approach is L1. In this approach we modify the unregularized cost function by adding the sum of the absolute values of the weights:
 
-$$C=C_0+\frac{\lambda}{n}\sum\limits_w|w|$$
+$$
+C=C_0+\frac{\lambda}{n}\sum\limits_w|w|
+$$
 
 Differentiating, we obtain the gradient updating rule:
 
-$$w->w-\frac{\eta\lambda}{n}\text{sgn}(w)-\eta\frac{dC_0}{dw}$$
+$$
+w->w-\frac{\eta\lambda}{n}\text{sgn}(w)-\eta\frac{dC_0}{dw}
+$$
 
-In L2 regularization, the weights shrink by an amount which is proportional to $w$. In L1 regularization, when a particular weight has a large magnitude, $|w|$, L1 regularization shrinks the weight much less than L2 regularization does. By contrast, when $|w|$ is small, L1 regularization shrinks the weight much more than L2 regularization. The net result is that L1 regularization tends to concentrate the weight of the network in a relatively small number of high-importance connections, while the other weights are driven toward zero.
+In L2 regularization, the weights shrink by an amount which is proportional to $$w$$. In L1 regularization, when a particular weight has a large magnitude, $$|w|$$, L1 regularization shrinks the weight much less than L2 regularization does. By contrast, when $$|w|$$ is small, L1 regularization shrinks the weight much more than L2 regularization. The net result is that L1 regularization tends to concentrate the weight of the network in a relatively small number of high-importance connections, while the other weights are driven toward zero.
 
 **Dropout**
 
