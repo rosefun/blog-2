@@ -129,7 +129,7 @@ MNIST是一个手写字符图像数据集，其中有60000训练样本，10000�
             dcdw[-l] = np.dot(dcdz, activations[-l-1].transpose())
         return (dcdb, dcdw)
 
-经过30次迭代，这样一个简单的实现，在validation set上已经达到了97%左右的准确率。
+这样的一个简单实现，经过30次迭代，在validation set上可以达到97%的准确率。
 
     Epoch 29 training complete
     Cost on training data: 0.0794132821371
@@ -137,15 +137,13 @@ MNIST是一个手写字符图像数据集，其中有60000训练样本，10000�
     Cost on evaluation data: 0.389545105544
     Accuracy on evaluation data: 9695 / 10000
 
-### Advanced
+### Regularization
 
-#### Regularization
+神经网络模型包含大量的参数，加上激活函数带来的非线性，有能力建模分布非常复杂的输入。所以，当模型在training_set上取得了很好的分数时，很可能是模型依赖本身很高的自由度找到了一个针对这一数据集的可行解。而数据集本身所蕴含的特征，未见得被很好地捕捉到了。这一现象称为[overfitting](http://neuralnetworksanddeeplearning.com/chap3.html#overfitting_and_regularization)。
 
-Models with a large number of free parameters can describe an amazingly wide range of phenomena. When such a model agrees well with the available data, it may just mean there's enough freedom in the model that it can describe almost any data set of the given size, without capturing any genuine insights into the underlying phenomenon. When this happens the model will work well for the existing data, but will fail to generalize to new situations. It is known as [overfitting](http://neuralnetworksanddeeplearning.com/chap3.html#overfitting_and_regularization).
+overfitting发生的迹象为：模型在test_set上的准确率不再提高，但在training_set上准确率却还在提高。从实践角度来说，如果我们看到模型在test_set上的准确率不再提高，就应该停止训练。
 
-What is the sign of overfitting? If accuracy on test set is no longer improving while total cost on training set is still decreasing, overfitting will happen. From a practical point of view, if we see that the accuracy on the test data is no longer improving, then we should stop training.
-
-How can we avoid overfitting? By increasing the amount of training data or reducing the size of network, we can reduce the extent to which overfitting occurs. However, there are other techniques which can reduce overfitting when we have a fixed network and fixed training data. These are known as regularization techniques, including:
+避免或者缓解overfitting的方式有很多，例如提供更多地training data，适当减小网络大小等。除此之外，还有一些通用的方法，包括：
 
   * weight decay(L1/L2 regularization)
   * dropout
@@ -188,13 +186,13 @@ In L2 regularization, the weights shrink by an amount which is proportional to $
 
 **Dropout**
 
-Dropout is a radically different technique for regularization. Unlike L1 and L2 regularization, dropout doesn't rely on modifying the cost function. Instead, in dropout we modify the network itself.
+Dropout和L1/L2有些不同。L1/L2是通过修改cost function来缓解overfitting，dropout则是通过修改网络结构。
 
-We start by randomly (and temporarily) deleting partial of the hidden neurons(known as dropout ratio) in the network, while leaving the input and output neurons untouched. After doing this over a mini-batch, we choose a new random subset of hidden neurons to delete, estimating the gradient for a different mini-batch, and updating the weights and biases in the network.
+每次mini-batch中，我们随机地删掉除input/output layer外hidden layer中的神经元，在删除后的新网络上计算梯度、更新参数，下一个mini-batch中随机删除另一组神经元。每次删除的节点个数占比称为dropout ratio。
 
-When we dropout different sets of neurons, it's rather like we're training different neural networks. And so the dropout procedure is like averaging the effects of a very large number of different networks. The different networks will overfit in different ways, and so, hopefully, the net effect of dropout will be to reduce overfitting.
+由于我们每次删除的节点不同，这就像在训练大量不同的网络，然后对它们做平均。即使每个网络都会overfitting，也是以不同的方式overfitting，最终的效果是整体网络的overfitting会被减轻。
 
-#### Hyper parameters
+### Hyper parameters
 
 Besides weights and biases, there are many other parameters in a neural network, known as hyper parameters:
   * layers
