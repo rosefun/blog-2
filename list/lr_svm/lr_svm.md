@@ -1,12 +1,10 @@
 ## Logistic Regression和分类
 
-Logistic regression（LR）自1958由David Cox提出，距今已有近60年的历史。它简单、实用，直到今天，仍然是解决分类问题的一个有效方法，在线搜索广告、推荐系统等系统中发挥着重要作用。
-
-由于习惯的不同，不同的文献对它的称呼十分多样：
+Logistic regression（LR）由David Cox在1958年提出，已有近60岁了。它简单、实用，直到今天，仍然是解决分类问题的一个常用方法，在很多领域和系统（如线搜索广告、推荐系统）中都有重要应用。习惯不同，不同文献对它的称呼有所不同：
 
   * LR本身是一个二分类模型。对于给定的输入，输出它属于类别正例（positive）还是反例（negative）。
   * LR的多分类推广称为Multinomial Logistic Regression，支持大于两个类别。LR是Multinomial LR的一个特例。
-  * Multinomial LR使用[softmax function](https://en.wikipedia.org/wiki/Softmax_function)来计算代价，又常被称为Softmax Regression。
+  * Multinomial LR使用[softmax function](https://en.wikipedia.org/wiki/Softmax_function)后的value来计算代价，又常被称为Softmax Regression。
   * 如果从信息论角度来看Multinomial LR，它又被称为最大熵算法（Max Entropy，ME）。
 
 下文我们将只讨论更为一般的Multinomial LR。同时，为了保持简洁，将统一使用LR来指代Multinomial LR。

@@ -1,4 +1,4 @@
-## primal&dual:linear regression as an example
+## Primal&dual:linear regression as an example
 
 ### TL;DR
 
@@ -14,7 +14,7 @@ solution(learn $w$): $\mathbf{w}=(\mathbf{X}^T\mathbf{X}+\lambda\mathbf{I})^{-1}
 
 fact: $w$ lies in the space spanned by training data.
 
-problem: $\mathbf{y}=\mathbf{x}^T(\mathbf{X}^T\mathbf\alpha)=\sum\limits_{i=1}^M\alpha_i\mathbf{x}^T\mathbf{X_i}$ ($\mathbf{X_i}$ is the ith row)
+problem transformed to: $\mathbf{y}=\mathbf{x}^T(\mathbf{X}^T\mathbf\alpha)=\sum\limits_{i=1}^M\alpha_i\mathbf{x}^T\mathbf{X_i}$ ($\mathbf{X_i}$ is the ith row)
 
 solution(learn $\alpha$): $\mathbf\alpha=(\mathbf{X}\mathbf{X}^T+\lambda\mathbf{I})^{-1}\mathbf{y}$
 
