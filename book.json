@@ -1,3 +1,5 @@
 {
-	"plugins": ["katex-full"]
+	"plugins": [
+        "katex-improved@git+https://github.com/yelu/gitbook-plugin-katex-improved.git#1.0.0"
+    ]
 }
