@@ -18,7 +18,7 @@ problem transformed to: $\mathbf{y}=\mathbf{x}^T(\mathbf{X}^T\mathbf\alpha)=\sum
 
 solution(learn $\alpha$): $\mathbf\alpha=(\mathbf{X}\mathbf{X}^T+\lambda\mathbf{I})^{-1}\mathbf{y}$
 
-### Matrix caculus
+### Matrix calculus
 
 To get solutions of loss funtions, we need [matrix derivative calculations](./matrix+vector+derivatives+for+machine+learning.pdf). It is not a new math opertion but  partial derivations to vector/matrix element-wise. The matrix notation help us to have a compact represention instead of writing down derivation for each element explicitly.
 
