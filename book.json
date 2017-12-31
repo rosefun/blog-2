@@ -1,13 +1,3 @@
 {
-	"plugins": ["katex"],
-	"pluginsConfig": {
-		"katex": {
-			"delimiters": [
-            { "left": "$$", "right": "$$", "display": true },
-			{ "left": "\\[", "right": "\\]", "display": true },
-			{ "left": "$", "right": "$", "display": false },
-			{ "left": "\\(", "right": "\\)", "display": false }
-            ]
-		}
-	}
+	"plugins": ["katex-full"],
 }
