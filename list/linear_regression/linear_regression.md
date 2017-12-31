@@ -8,21 +8,21 @@ minimizing a sum-of-square error fucntion with the **addition of a quadratic reg
 
 ### Likelihood, prior and posterior
 
-In probability theory, if event $x$ happens, then $y$ happens, but only $y$ is observed, we call:
+In statistics, a likelihood function (often simply the likelihood) is a function of the parameters of a statistical model given data. We call:
 
-  * $p(x)$ -> prior distribution
-  * $p(y|x)$ -> likelihood function
-  * $p(x|y)$ -> posterior distribution
+  * \(p(\theta)\) -> prior distribution
+  * \(p(D|\theta)\) -> likelihood function
+  * \(p(\theta|D)\) -> posterior distribution
 
 They are linked through bayes' theorem.
 
-Returning back to bayesian model, recall that a model is actually a transformation from input $\mathbf x$ to output $\mathbf y$, governed by parameter $\mathbf w$. The bayesian theory thinks the parameter $\mathbf w$ is not some constants but a distribution $p(\mathbf w)$. During training phase, output $\mathbf y$ is observed. Comopared to bayesian theory, $\mathbf w \Rightarrow x, \mathbf y \Rightarrow y$,
+Returning back to bayesian model, recall that a model is actually a transformation from input \(\mathbf x\) to output \(\mathbf y\), governed by parameter \(\mathbf w\). The bayesian theory thinks the parameter \(\mathbf w\) is not a constant but some distribution \(p(\mathbf w)\). During training phase, output \(\mathbf y\) is observed. Comopared to bayesian theory, \(\mathbf w \Rightarrow \theta, \mathbf y \Rightarrow D\),
 
-  * $p(\mathbf w)$ -> prior distribution
-  * $p(\mathbf y|\mathbf w, \mathbf x)$ -> likelihood function
-  * the conditional ditribution $p(\mathbf w|\mathbf y, \mathbf x)$ represents the corresponding **posterior distribution** over $\mathbf w$. 
+  * \(p(\mathbf w)\) -> prior distribution
+  * \(p(\mathbf y|\mathbf w, \mathbf x)\) -> likelihood function
+  * the conditional ditribution \(p(\mathbf w|\mathbf y, \mathbf x)\) represents the corresponding **posterior distribution** over \(\mathbf w\). 
 
-We are not seeking to model the distribution of $\mathbf x$. Thus it will always appear in the set of conditioning variables and we could even drop it to keep the notation compact. It is clear that when we are talking about bayesian model, we mean the relation between parameters $\mathbf w$ and observation $\mathbf y$, not model's input $\mathbf x$ and $\mathbf y$. 
+We are not seeking to model the distribution of \(\mathbf x\). Thus it will always appear in the set of conditioning variables and we could even drop it to keep the notation compact. It is clear that when we are talking about bayesian model, we often refer to the way we model parameters \(\mathbf w\) and data \(\mathbf D\)(likelihood or posterior), not model's input \(\mathbf x\) and \(\mathbf y\). 
 
 Those concepts here are usually confused to discriminative vs generative. Read the appendix to distiguish them.
 
@@ -31,7 +31,7 @@ Those concepts here are usually confused to discriminative vs generative. Read t
 If the posterior distributions p(w|y) are in the same family as the prior probability distribution p(w), 
 
   * the prior and posterior are then called conjugate distributions
-  * and the prior is called a [conjugate prior](https://en.wikipedia.org/wiki/Conjugate_prior) **for the likelihood function**..
+  * and the prior is called a [conjugate prior](https://en.wikipedia.org/wiki/Conjugate_prior) **for the likelihood function**.
 
 Guassian prior is essential to link l2-regularized LSE loss to a bayesian model. 
 
@@ -43,15 +43,15 @@ The difference between discriminitive and generative is how they model the relat
 
 |     d/g            |      modeling       |
 |--------------------|:-------------------:|
-| discriminative     |  $p(y\|x)$           |
-| generative         |    $p(x,y)$           | 
+| discriminative     |  \(p(y\|x)\)           |
+| generative         |    \(p(x,y)\)           | 
 
 The debate between bayesian and frequist is how they model the relationship between model's data (x,y) and parameters w. The bayesian think everything is a variable.
 
 |    f/b             |      modeling       |
 |--------------------|:-------------------:|
-|   frequist   |       $p(x,y\|w)$ or $p(y\|x, w)$         |
-|  bayesian        |    $p(x,y,w)$         | 
+|   frequist   |       \(p(x,y\|w)\) or \(p(y\|x, w)\)         |
+|  bayesian        |    \(p(x,y,w)\)         | 
 
 If you are going to go deeper, refer to some readings at the end.
 
